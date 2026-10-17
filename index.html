@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Special Letter For Torsha ✨ | From Sriparno</title>
+
+  <!-- Tailwind CSS (pinned) -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            roseGlow: '#ff758c',
+            lavenderGlow: '#ff7eb3',
+            darkBg: '#0b0813',
+            envelopePaper: '#fef3c7',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            cursive: ['Dancing Script', 'cursive'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'bounce-subtle': 'bounceSubtle 2s ease-in-out infinite',
+          },
+          keyframes: {
+            bounceSubtle: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-6px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0b0813; }
+    ::-webkit-scrollbar-thumb { background: #ff758c; border-radius: 4px; }
+
+    #particle-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glass-card {
+      background: rgba(21, 16, 32, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 117, 140, 0.25);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(255, 117, 140, 0.18);
+    }
+
+    .envelope-wrapper { perspective: 1000px; }
+
+    .envelope {
+      width: 300px;
+      height: 200px;
+      background: #e11d48;
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 15px 35px rgba(225, 29, 72, 0.35), 0 0 20px rgba(0,0,0,0.5);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    @media (min-width: 640px) {
+      .envelope { width: 380px; height: 250px; }
+    }
+    .envelope:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 22px 45px rgba(225, 29, 72, 0.5), 0 0 30px rgba(255, 117, 140, 0.3);
+    }
+    .envelope:focus-visible { outline: 3px solid #ff758c; outline-offset: 6px; }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      border-left: 150px solid transparent;
+      border-right: 150px solid transparent;
+      border-top: 110px solid #be123c;
+      transform-origin: top;
+      transition: transform 0.6s ease-in-out;
+      z-index: 3;
+    }
+    @media (min-width: 640px) {
+      .envelope-flap {
+        border-left: 190px solid transparent;
+        border-right: 190px solid transparent;
+        border-top: 135px solid #be123c;
+      }
+    }
+    .envelope.open .envelope-flap { transform: rotateX(180deg); z-index: 1; }
+
+    .envelope-pocket {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      border-left: 150px solid #f43f5e;
+      border-right: 150px solid #f43f5e;
+      border-bottom: 100px solid #fb7185;
+      border-radius: 0 0 12px 12px;
+      z-index: 2;
+    }
+    @media (min-width: 640px) {
+      .envelope-pocket {
+        border-left: 190px solid #f43f5e;
+        border-right: 190px solid #f43f5e;
+        border-bottom: 125px solid #fb7185;
+      }
+    }
+
+    .letter-preview {
+      position: absolute;
+      bottom: 15px; left: 50%;
+      transform: translateX(-50%);
+      width: 85%; height: 75%;
+      background: #fef3c7;
+      border-radius: 8px;
+      z-index: 1;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
+    }
+    .envelope.open .letter-preview { transform: translateX(-50%) translateY(-100px); }
+
+    .food-card { transition: all 0.25s ease; }
+    .food-card:focus-visible { outline: 2px solid #ff758c; outline-offset: 2px; }
+    .food-card.selected {
+      border-color: #ff758c;
+      background: rgba(255, 117, 140, 0.2);
+      box-shadow: 0 0 20px rgba(255, 117, 140, 0.4);
+      transform: scale(1.03);
+    }
+
+    .fade-step { animation: stepIn 0.5s ease both; }
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fade-step, .animate-pulse-slow, .animate-bounce-subtle, .animate-bounce { animation: none !important; }
+      .envelope, .envelope-flap, .letter-preview, .food-card { transition: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-darkBg text-slate-100 font-sans min-h-screen flex items-center justify-center p-4 sm:p-6 overflow-x-hidden relative selection:bg-roseGlow selection:text-white">
+
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <div class="fixed top-10 left-10 w-80 h-80 bg-roseGlow/15 rounded-full blur-3xl pointer-events-none animate-pulse-slow"></div>
+  <div class="fixed bottom-10 right-10 w-96 h-96 bg-lavenderGlow/15 rounded-full blur-3xl pointer-events-none animate-pulse-slow" style="animation-delay: 2s;"></div>
+
+  <main class="w-full max-w-2xl relative z-10 my-6">
+
+    <!-- ==================== STEP 0: ENVELOPE ==================== -->
+    <div id="step-envelope" class="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-8 fade-step">
+
+      <div class="space-y-3">
+        <span class="inline-block px-4 py-1.5 rounded-full bg-roseGlow/10 border border-roseGlow/30 text-roseGlow text-xs sm:text-sm font-medium tracking-wider uppercase">
+          💌 Private Message For Torsha
+        </span>
+        <h1 class="text-3xl sm:text-5xl font-cursive font-bold text-transparent bg-clip-text bg-gradient-to-r from-roseGlow via-pink-200 to-lavenderGlow">
+          You Have Received a Letter
+        </h1>
+        <p class="text-slate-400 text-xs sm:text-sm max-w-xs sm:max-w-md mx-auto">
+          Tap the wax-sealed envelope below to open what Sriparno wrote for you...
+        </p>
+      </div>
+
+      <div class="envelope-wrapper my-6" onclick="openEnvelope()">
+        <div id="main-envelope" class="envelope flex items-center justify-center" role="button" tabindex="0" aria-label="Open the letter"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openEnvelope();}">
+          <div class="envelope-flap"></div>
+          <div class="letter-preview p-4 flex flex-col justify-between text-slate-800">
+            <div class="text-[10px] font-mono text-amber-800/60 font-bold">TOP SECRET</div>
+            <div class="font-cursive text-amber-900 text-lg font-bold text-center">To: Devi 👑</div>
+            <div class="text-[9px] text-amber-800/60 text-right">From: Sipu</div>
+          </div>
+          <div class="envelope-pocket"></div>
+
+          <div id="wax-seal" class="absolute z-10 w-12 h-12 sm:w-14 sm:h-14 bg-amber-400 border-2 border-amber-200 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+            <span class="text-amber-950 font-cursive text-xl font-bold">S</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-xs text-roseGlow/80 animate-bounce-subtle font-medium">
+        ✨ Click anywhere on the envelope to open
+      </p>
+    </div>
+
+    <!-- ==================== STEP 1: THE LETTER ==================== -->
+    <div id="step-letter" class="hidden glass-card rounded-3xl p-6 sm:p-10 fade-step">
+
+      <div class="text-center mb-6">
+        <span class="text-xs uppercase tracking-widest text-roseGlow font-semibold bg-roseGlow/10 px-3 py-1 rounded-full border border-roseGlow/20">
+          From Sipu's Heart
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-cursive font-bold text-transparent bg-clip-text bg-gradient-to-r from-roseGlow via-pink-300 to-lavenderGlow mt-2">
+          Dearest Torsha... ✨
+        </h2>
+      </div>
+
+      <div class="space-y-4 text-slate-200 text-sm sm:text-base leading-relaxed font-sans bg-black/30 p-5 sm:p-8 rounded-2xl border border-white/5 shadow-inner">
+        <p>
+          I’ll be completely honest with you... I don’t know the exact day, the exact hour, or the exact moment it happened. I don’t even know how or why my heart chose you. All I know with absolute certainty is that I fell deeply, completely, and undeniably in love with you.
+        </p>
+
+        <p>
+          You’ve completely taken over my thoughts. Whether you’re jokingly demanding royal respect like a true <span class="text-rose-300 font-semibold px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30">"Devi"</span>, or calling me <span class="text-rose-300 font-semibold px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30">"Sipu"</span>, or when we end up making up hilarious names like <span class="text-rose-300 font-semibold px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30">"snosa"</span>—every single second spent talking to you feels like the best part of my entire day.
+        </p>
+
+        <p>
+          I love the way we roast each other, I love late-night reels, and most of all, I love how effortless it feels just being myself around you. You have this beautiful, magnetic energy that makes everything else fade into the background.
+        </p>
+
+        <p class="pt-2 italic text-rose-200 font-serif text-center sm:text-lg border-t border-b border-rose-500/20 py-3 my-2">
+          "I didn't plan on loving you this much... but now I can't imagine my world without you in it."
+        </p>
+
+        <p>
+          I don't want to hide behind indirect poetic hints or joke around anymore. I want to stand beside you, support you, make you smile every single day, and give you all the love you truly deserve.
+        </p>
+      </div>
+
+      <div class="mt-8 text-center p-6 rounded-2xl bg-gradient-to-r from-roseGlow/20 via-pink-500/15 to-lavenderGlow/20 border border-roseGlow/40 shadow-xl">
+        <p class="text-sm uppercase tracking-wider text-rose-200/80 font-medium">There's only one question left to ask...</p>
+        <p class="text-xl sm:text-3xl font-extrabold text-white mt-2 drop-shadow">
+          I love you. Can I be your boyfriend?
+        </p>
+      </div>
+
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+        <button onclick="chooseProposalYes()" class="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-semibold text-lg shadow-lg shadow-roseGlow/30 hover:shadow-roseGlow/60 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2">
+          <span>Yes, of course! ❤️</span>
+        </button>
+
+        <button onclick="chooseProposalNo()" class="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-800/90 hover:bg-slate-700 border border-slate-600/80 text-slate-300 font-medium text-base shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <span>No, I'm sorry 💔</span>
+        </button>
+      </div>
+
+      <p class="text-center text-xs text-slate-500 mt-4">Always yours, Sriparno</p>
+      <p class="text-center text-[11px] text-slate-500 mt-1">Your answer gets sent straight to Sriparno 💌</p>
+    </div>
+
+    <!-- ==================== STEP 2: "YES" + DATE INVITATION ==================== -->
+    <div id="step-yes-gratitude" class="hidden glass-card rounded-3xl p-6 sm:p-10 text-center space-y-6 fade-step">
+
+      <div class="inline-flex p-4 rounded-full bg-roseGlow/20 border border-roseGlow/40 text-roseGlow animate-bounce">
+        <svg class="w-12 h-12 fill-roseGlow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </div>
+
+      <h2 class="text-3xl sm:text-5xl font-cursive font-bold text-transparent bg-clip-text bg-gradient-to-r from-roseGlow via-pink-200 to-lavenderGlow">
+        You've Made Me The Happiest Guy Alive! 💖
+      </h2>
+
+      <div class="bg-black/30 p-6 rounded-2xl border border-white/5 text-slate-200 text-sm sm:text-base leading-relaxed space-y-3 text-left">
+        <p class="text-center font-medium text-rose-200 text-lg">
+          Thank you so much, Torsha! 🥹✨
+        </p>
+        <p>
+          I genuinely cannot put into words how much this means to me. Thank you for trusting me with your heart, for accepting my feelings, and for choosing to start this beautiful chapter together. I promise to cherish you, listen to you, make you laugh, and always be someone you can rely on.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-gradient-to-r from-roseGlow/15 to-lavenderGlow/15 border border-roseGlow/30 space-y-4">
+        <h3 class="text-lg sm:text-xl font-bold text-white">
+          Would you like to go on a special date with me right after school? 🏫✨
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-300">
+          Just a cute little hangout right beside school to celebrate us!
+        </p>
+
+        <div class="flex flex-col sm:flex-row justify-center gap-4 pt-2">
+          <button onclick="chooseDateYes()" class="px-8 py-3.5 rounded-full bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-semibold text-base shadow-lg shadow-roseGlow/30 hover:scale-105 transition-all cursor-pointer">
+            Yes, let's go on a date! ✨
+          </button>
+          <button onclick="chooseDateNo()" class="px-8 py-3.5 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-medium text-base transition-all cursor-pointer">
+            Maybe another time / No for now 🌸
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== STEP 3A: DATE FORM ==================== -->
+    <div id="step-date-form" class="hidden glass-card rounded-3xl p-6 sm:p-10 space-y-6 fade-step">
+
+      <div class="text-center space-y-2">
+        <span class="text-xs uppercase tracking-widest text-roseGlow font-semibold bg-roseGlow/10 px-3 py-1 rounded-full border border-roseGlow/20">
+          After-School Date Planner 🎒✨
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-bold text-white">
+          Let's Plan Our First Hangout!
+        </h2>
+        <p class="text-slate-400 text-xs sm:text-sm">
+          Pick a school day (Mon, Wed, Thu, Fri) &amp; choose your favorite treat!
+        </p>
+      </div>
+
+      <div class="space-y-6 bg-black/30 p-6 rounded-2xl border border-white/5">
+
+        <div class="space-y-2">
+          <label for="date-input" class="block text-sm font-semibold text-rose-200">
+            1. Select a Date (After School):
+          </label>
+          <input type="date" id="date-input" onchange="validateSelectedDate()" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:border-roseGlow focus:ring-1 focus:ring-roseGlow transition-colors cursor-pointer" style="color-scheme: dark;">
+          <p id="date-error" class="text-xs text-amber-400 hidden font-medium mt-1">
+            ⚠️ Tuesdays and weekends are excluded (school days only!). Please pick Monday, Wednesday, Thursday, or Friday.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <label class="block text-sm font-semibold text-rose-200">
+            2. Choose What We Should Eat Beside School:
+          </label>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+            <div onclick="selectFood('doi')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectFood('doi');}" id="food-doi" role="button" tabindex="0"
+                 class="food-card selected p-4 rounded-xl bg-slate-900/90 border border-slate-700 cursor-pointer text-center space-y-2">
+              <div class="text-3xl">🥣</div>
+              <div class="font-bold text-sm text-white">Doi Fuchka</div>
+              <div class="text-[11px] text-slate-400">Sweet, tangy &amp; delicious</div>
+            </div>
+
+            <div onclick="selectFood('fuchka')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectFood('fuchka');}" id="food-fuchka" role="button" tabindex="0"
+                 class="food-card p-4 rounded-xl bg-slate-900/90 border border-slate-700 cursor-pointer text-center space-y-2">
+              <div class="text-3xl">🤤</div>
+              <div class="font-bold text-sm text-white">Classic Fuchka</div>
+              <div class="text-[11px] text-slate-400">Crispy, spicy street treat</div>
+            </div>
+
+            <div onclick="selectFood('icecream')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectFood('icecream');}" id="food-icecream" role="button" tabindex="0"
+                 class="food-card p-4 rounded-xl bg-slate-900/90 border border-slate-700 cursor-pointer text-center space-y-2">
+              <div class="text-3xl">🍦</div>
+              <div class="font-bold text-sm text-white">Ice-Cream</div>
+              <div class="text-[11px] text-slate-400">Sweet &amp; chilling treat</div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label for="food-note" class="block text-sm font-semibold text-rose-200">
+            3. Anything else you want to tell me? (Optional)
+          </label>
+          <input type="text" id="food-note" maxlength="200" placeholder="E.g., Extra phuchka water please!" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-roseGlow">
+        </div>
+
+        <button id="lock-btn" onclick="submitDatePlan()" class="w-full py-4 rounded-xl bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-bold text-base shadow-lg shadow-roseGlow/30 hover:opacity-95 transition-opacity cursor-pointer">
+          Lock In Our Date Plan! 🔒✨
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ==================== STEP 3B: NO DATE ==================== -->
+    <div id="step-date-no" class="hidden glass-card rounded-3xl p-6 sm:p-10 text-center space-y-6 fade-step">
+      <div class="inline-flex p-4 rounded-full bg-pink-500/20 border border-pink-500/40 text-pink-300">
+        🌸
+      </div>
+      <h2 class="text-2xl sm:text-4xl font-bold text-white">
+        No Rush At All, Torsha! ✨
+      </h2>
+      <div class="bg-black/30 p-6 rounded-2xl border border-white/5 text-slate-200 text-sm sm:text-base leading-relaxed text-left space-y-3">
+        <p>
+          There is absolutely zero pressure or hurry! Knowing that you accepted my feelings is more than enough to put the biggest smile on my face for weeks.
+        </p>
+        <p>
+          Whenever you feel like grabbing food or hanging out after school, just say the word and Sipu will be right there. For now, let's just enjoy being together! 💖
+        </p>
+      </div>
+    </div>
+
+    <!-- ==================== STEP 4: PROPOSAL DECLINED ==================== -->
+    <div id="step-proposal-no" class="hidden glass-card rounded-3xl p-6 sm:p-10 space-y-6 fade-step">
+
+      <div class="text-center space-y-2">
+        <div class="inline-flex p-3 rounded-full bg-slate-800 border border-slate-700 text-slate-400 mb-2">
+          🤝
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-bold text-slate-100">
+          I Understand &amp; Respect Your Decision.
+        </h2>
+        <p class="text-xs uppercase tracking-widest text-slate-400">A Message From Sriparno</p>
+      </div>
+
+      <div class="bg-black/30 p-6 rounded-2xl border border-white/5 text-slate-200 text-sm sm:text-base leading-relaxed space-y-4">
+        <p>
+          First of all, I want to sincerely apologize if sharing my feelings made you feel uncomfortable or put you in an awkward spot. That was never my intention.
+        </p>
+        <p>
+          More than anything else in this world, <strong class="text-rose-200">you are my best friend</strong>. Our bond, our talks, our roasting, and the trust we share mean infinitely more to me than my own feelings. I never want to lose you, nor do I ever want things between us to feel weird or broken.
+        </p>
+        <p>
+          Thank you for being honest with me. Please don't hesitate to talk to me or tease me just like you always do. I will always be your same reliable Sipu, standing by your side as your best friend whenever you need me.
+        </p>
+        <p class="text-center text-rose-300 font-medium italic pt-2">
+          "Best friends first, best friends always." ✨
+        </p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== FINAL DATE SUMMARY MODAL ==================== -->
+  <div id="summary-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="summary-title">
+    <div id="summary-modal-card" class="glass-card max-w-md w-full rounded-3xl p-6 sm:p-8 text-center space-y-5 border border-roseGlow/40 shadow-2xl transform scale-95 transition-transform duration-300">
+
+      <div class="inline-flex p-3 rounded-full bg-roseGlow/20 text-roseGlow">
+        <svg class="w-8 h-8 fill-roseGlow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      </div>
+
+      <h3 id="summary-title" class="text-2xl font-bold text-white">Our After-School Date is Set! 🎉</h3>
+
+      <div class="bg-black/40 p-4 rounded-xl text-left text-sm space-y-2 border border-white/5">
+        <p><strong class="text-rose-300">Date:</strong> <span id="summary-date-text" class="text-white"></span></p>
+        <p><strong class="text-rose-300">Selected Treat:</strong> <span id="summary-food-text" class="text-white"></span></p>
+        <p id="summary-note-box" class="hidden"><strong class="text-rose-300">Note:</strong> <span id="summary-note-text" class="text-slate-200 italic"></span></p>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        I can't wait for school to end that day so we can go get a treat together, Torsha! ✨
+      </p>
+
+      <p id="send-status" class="text-[11px] text-slate-400"></p>
+
+      <button onclick="closeSummaryModal()" class="w-full py-3 rounded-xl bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-bold text-sm shadow-md hover:opacity-90 transition-opacity cursor-pointer">
+        Can't Wait! 💖
+      </button>
+
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================
+       CONFIG — change this one line
+       Put YOUR email here. See setup notes (FormSubmit):
+       the very first submission sends you an activation
+       email; click the link inside it once and you're done.
+       ===================================================== */
+    const NOTIFY_EMAIL = 'sriparnomalik9@gmail.com';
+
+    /* -------- Email sender (no server needed) -------- */
+    async function sendToSriparno(stage, details) {
+      try {
+        const res = await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(NOTIFY_EMAIL), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            _subject: '💌 Torsha replied: ' + stage,
+            _template: 'table',
+            _captcha: 'false',
+            Stage: stage,
+            Details: details || '—',
+            'Sent at': new Date().toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short' })
+          })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json().catch(() => ({}));
+        return data.success !== 'false' && data.success !== false;
+      } catch (err) {
+        console.error('Email send failed:', err);
+        return false;
+      }
+    }
+
+    /* -------- 1. Particle canvas -------- */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() { this.reset(true); }
+      reset(initial = false) {
+        this.x = Math.random() * canvas.width;
+        this.y = initial ? Math.random() * canvas.height : canvas.height + Math.random() * 80;
+        this.size = Math.random() * 10 + 6;
+        this.speedY = Math.random() * 0.8 + 0.3;
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.opacity = Math.random() * 0.4 + 0.2;
+      }
+      update() {
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        if (this.y < -20) this.reset();
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = '#ff758c';
+        ctx.font = this.size + 'px serif';
+        ctx.fillText('♥', this.x, this.y);
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < 30; i++) particles.push(new Particle());
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { if (!reduceMotion) p.update(); p.draw(); });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    /* -------- 2. Date helpers (local time, not UTC) -------- */
+    const pad = n => String(n).padStart(2, '0');
+    const toLocalISO = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    const isSchoolDay = d => ![0, 2, 6].includes(d.getDay()); // no Sun, Tue, Sat
+
+    function getNextValidSchoolDay() {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      while (!isSchoolDay(d)) d.setDate(d.getDate() + 1);
+      return toLocalISO(d);
+    }
+
+    const dateInput = document.getElementById('date-input');
+    dateInput.min = toLocalISO(new Date());
+    dateInput.value = getNextValidSchoolDay();
+
+    /* -------- 3. State -------- */
+    const FOODS = {
+      doi:      { label: 'Doi Fuchka 🥣',    el: 'food-doi' },
+      fuchka:   { label: 'Classic Fuchka 🤤', el: 'food-fuchka' },
+      icecream: { label: 'Ice-Cream 🍦',      el: 'food-icecream' }
+    };
+    let selectedFood = 'doi';
+    let envelopeOpened = false;
+    let planSubmitted = false;
+
+    /* -------- 4. Step navigation -------- */
+    const STEPS = ['step-envelope', 'step-letter', 'step-yes-gratitude', 'step-date-form', 'step-date-no', 'step-proposal-no'];
+
+    function showStep(id) {
+      STEPS.forEach(s => document.getElementById(s).classList.add('hidden'));
+      const el = document.getElementById(id);
+      el.classList.remove('hidden');
+      // restart the entrance animation
+      el.classList.remove('fade-step');
+      void el.offsetWidth;
+      el.classList.add('fade-step');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openEnvelope() {
+      if (envelopeOpened) return;
+      envelopeOpened = true;
+      document.getElementById('main-envelope').classList.add('open');
+      setTimeout(() => showStep('step-letter'), 900);
+    }
+
+    /* -------- 5. Proposal answers (each one emails you) -------- */
+    function chooseProposalYes() {
+      showStep('step-yes-gratitude');
+      sendToSriparno('She said YES ❤️', 'Torsha said yes to being your girlfriend!');
+      if (typeof confetti === 'function' && !reduceMotion) {
+        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ['#ff758c', '#ff7eb3', '#ffffff'] });
+      }
+    }
+
+    function chooseProposalNo() {
+      showStep('step-proposal-no');
+      sendToSriparno('She said no 💔', "Torsha chose \"No, I'm sorry\" — she saw the best-friends message.");
+    }
+
+    /* -------- 6. Date answers -------- */
+    function chooseDateYes() { showStep('step-date-form'); }
+
+    function chooseDateNo() {
+      showStep('step-date-no');
+      sendToSriparno('Date: not now 🌸', 'She said yes to the proposal but chose "Maybe another time / No for now" for the date.');
+    }
+
+    /* -------- 7. Food selection -------- */
+    function selectFood(key) {
+      if (!FOODS[key]) return;
+      selectedFood = key;
+      Object.values(FOODS).forEach(f => document.getElementById(f.el).classList.remove('selected'));
+      document.getElementById(FOODS[key].el).classList.add('selected');
+    }
+
+    /* -------- 8. Date validation -------- */
+    function validateSelectedDate() {
+      const errorMsg = document.getElementById('date-error');
+      if (!dateInput.value) { errorMsg.classList.remove('hidden'); return false; }
+
+      const chosen = new Date(dateInput.value + 'T00:00:00');
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const valid = isSchoolDay(chosen) && chosen >= today;
+
+      errorMsg.textContent = chosen < today
+        ? '⚠️ That date has already passed. Please pick an upcoming school day.'
+        : '⚠️ Tuesdays and weekends are excluded (school days only!). Please pick Monday, Wednesday, Thursday, or Friday.';
+      errorMsg.classList.toggle('hidden', valid);
+      return valid;
+    }
+
+    /* -------- 9. Submit the date plan -------- */
+    async function submitDatePlan() {
+      if (planSubmitted) return;
+      if (!validateSelectedDate()) {
+        alert('Please pick a valid upcoming school day (Mon, Wed, Thu, or Fri) for our after-school date!');
+        return;
+      }
+
+      planSubmitted = true;
+      const btn = document.getElementById('lock-btn');
+      btn.disabled = true;
+      btn.classList.add('opacity-60', 'cursor-not-allowed');
+
+      const chosen = new Date(dateInput.value + 'T00:00:00');
+      const prettyDate = chosen.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const food = FOODS[selectedFood].label;
+      const note = document.getElementById('food-note').value.trim();
+
+      document.getElementById('summary-date-text').textContent = prettyDate;
+      document.getElementById('summary-food-text').textContent = food;
+
+      if (note) {
+        document.getElementById('summary-note-text').textContent = '"' + note + '"';
+        document.getElementById('summary-note-box').classList.remove('hidden');
+      } else {
+        document.getElementById('summary-note-box').classList.add('hidden');
+      }
+
+      const status = document.getElementById('send-status');
+      status.textContent = 'Sending your plan to Sriparno… 💌';
+      openSummaryModal();
+
+      if (typeof confetti === 'function' && !reduceMotion) {
+        confetti({ particleCount: 90, spread: 80, origin: { y: 0.5 }, colors: ['#ff758c', '#ff7eb3', '#fef3c7'] });
+      }
+
+      const ok = await sendToSriparno(
+        'Date plan locked in 🎉',
+        'Date: ' + prettyDate + '\nTreat: ' + food + '\nNote: ' + (note || '(none)')
+      );
+
+      status.textContent = ok
+        ? 'Sent to Sriparno ✅'
+        : "Couldn't send automatically 🙈 Please screenshot this and send it to Sriparno!";
+    }
+
+    /* -------- 10. Modal -------- */
+    function openSummaryModal() {
+      const modal = document.getElementById('summary-modal');
+      const card = document.getElementById('summary-modal-card');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeSummaryModal() {
+      const modal = document.getElementById('summary-modal');
+      const card = document.getElementById('summary-modal-card');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSummaryModal(); });
+  </script>
+
+</body>
+</html>
