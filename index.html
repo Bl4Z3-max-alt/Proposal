@@ -449,31 +449,30 @@
 
   <script>
     /* =====================================================
-       CONFIG — change this one line
-       Put YOUR email here. See setup notes (FormSubmit):
-       the very first submission sends you an activation
-       email; click the link inside it once and you're done.
+       CONFIG: paste your Web3Forms access key here.
+       The key is linked to sriparnomailk9@gmail.com when you
+       create it at web3forms.com, so all replies land there.
        ===================================================== */
-    const NOTIFY_EMAIL = 'sriparnomalik9@gmail.com';
+    const WEB3FORMS_ACCESS_KEY = '7323dbd2-6e64-41b6-ae44-d9c7fb7b4c28';
 
-    /* -------- Email sender (no server needed) -------- */
+    /* -------- Email sender via Web3Forms (no server needed) -------- */
     async function sendToSriparno(stage, details) {
       try {
-        const res = await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(NOTIFY_EMAIL), {
+        const res = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({
-            _subject: '💌 Torsha replied: ' + stage,
-            _template: 'table',
-            _captcha: 'false',
+            access_key: WEB3FORMS_ACCESS_KEY,
+            subject: '💌 Torsha replied: ' + stage,
+            from_name: 'Proposal Page 💌',
             Stage: stage,
             Details: details || '—',
             'Sent at': new Date().toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short' })
           })
         });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json().catch(() => ({}));
-        return data.success !== 'false' && data.success !== false;
+        if (!res.ok || data.success !== true) throw new Error(data.message || ('HTTP ' + res.status));
+        return true;
       } catch (err) {
         console.error('Email send failed:', err);
         return false;
