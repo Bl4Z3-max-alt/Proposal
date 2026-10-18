@@ -9,6 +9,8 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <!-- Canvas Confetti Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- html2canvas (for saving the VIP pass as an image) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -150,6 +152,95 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+
+    /* ---------- Typewriter cursor ---------- */
+    .tw-cursor {
+      display: inline-block;
+      margin-left: 2px;
+      color: #ff758c;
+      font-weight: 300;
+      transform: translateY(-1px);
+      animation: twBlink 1.05s ease-in-out infinite;
+      transition: opacity 0.9s ease;
+    }
+    .tw-cursor.fade { opacity: 0; animation: none; }
+    @keyframes twBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* ---------- VIP Date Pass ---------- */
+    #vip-pass-capture {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 14px;
+      background: #0b0813;
+    }
+    .vip-pass {
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 2px solid #f5c26b;
+      background: linear-gradient(160deg, #241238 0%, #3a1642 55%, #5a1a46 100%);
+      padding: 22px 20px 18px;
+      color: #ffffff;
+      text-align: left;
+    }
+    .vip-top {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+      font-weight: 700; color: #f5c26b;
+    }
+    .vip-title {
+      margin-top: 12px; text-align: center;
+      font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600;
+      letter-spacing: 0.14em; color: #fde7b0;
+    }
+    .vip-for {
+      margin-top: 10px; text-align: center; font-size: 10px;
+      letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.6);
+    }
+    .vip-name {
+      text-align: center; font-family: 'Dancing Script', cursive;
+      font-size: 46px; font-weight: 700; line-height: 1.15; color: #ff9eb5;
+    }
+    .vip-rows { margin-top: 10px; }
+    .vip-row {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+      padding: 8px 0; border-bottom: 1px dashed rgba(245,194,107,0.28);
+    }
+    .vip-label {
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      font-weight: 700; color: #f5c26b; flex-shrink: 0;
+    }
+    .vip-value { font-size: 14px; font-weight: 500; color: #ffffff; text-align: right; }
+    .vip-tear {
+      position: relative; margin: 16px -20px 14px;
+      border-top: 2px dashed rgba(245,194,107,0.55);
+    }
+    .vip-tear::before, .vip-tear::after {
+      content: ''; position: absolute; top: -12px; width: 22px; height: 22px;
+      border-radius: 50%; background: #0b0813; border: 2px solid #f5c26b;
+    }
+    .vip-tear::before { left: -13px; }
+    .vip-tear::after  { right: -13px; }
+    .vip-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+    .vip-ticket {
+      margin-top: 3px; font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+      font-size: 15px; font-weight: 700; letter-spacing: 0.08em; color: #ffffff;
+    }
+    .vip-issued { margin-top: 3px; font-size: 9px; color: rgba(255,255,255,0.55); }
+    .vip-barcode { display: flex; gap: 2px; height: 36px; align-items: stretch; }
+    .vip-barcode i { display: block; background: #f5c26b; }
+    .vip-stamp {
+      display: none; position: absolute; right: 16px; top: 176px;
+      transform: rotate(-14deg); padding: 4px 12px; border-radius: 8px;
+      border: 3px solid #7cffb2; color: #7cffb2; font-size: 15px; font-weight: 800;
+      letter-spacing: 0.2em; background: rgba(11,8,19,0.55);
+    }
+    .vip-stamp.show { display: block; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tw-cursor { animation: none !important; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .fade-step, .animate-pulse-slow, .animate-bounce-subtle, .animate-bounce { animation: none !important; }
       .envelope, .envelope-flap, .letter-preview, .food-card { transition: none !important; }
@@ -220,47 +311,36 @@
         </h2>
       </div>
 
-      <div class="space-y-4 text-slate-200 text-sm sm:text-base leading-relaxed font-sans bg-black/30 p-5 sm:p-8 rounded-2xl border border-white/5 shadow-inner">
-        <p>
-          I’ll be completely honest with you... I don’t know the exact day, the exact hour, or the exact moment it happened. I don’t even know how or why my heart chose you. All I know with absolute certainty is that I fell deeply, completely, and undeniably in love with you.
-        </p>
+      <!-- The letter text is typed in here by the Typewriter module (see LETTER_TEXT in the script) -->
+      <div id="letter-body" class="space-y-4 text-slate-200 text-sm sm:text-base leading-relaxed font-sans bg-black/30 p-5 sm:p-8 rounded-2xl border border-white/5 shadow-inner" aria-label="Letter from Sriparno"></div>
 
-        <p>
-          You’ve completely taken over my thoughts. Whether you’re jokingly demanding royal respect like a true <span class="text-rose-300 font-semibold px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30">"Devi"</span>, or calling me <span class="text-rose-300 font-semibold px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30">"Sipu"</span>, or when we end up making up hilarious names like <span class="text-rose-300 font-semibold px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30">"snosa"</span>—every single second spent talking to you feels like the best part of my entire day.
-        </p>
-
-        <p>
-          I love the way we roast each other, I love late-night reels, and most of all, I love how effortless it feels just being myself around you. You have this beautiful, magnetic energy that makes everything else fade into the background.
-        </p>
-
-        <p class="pt-2 italic text-rose-200 font-serif text-center sm:text-lg border-t border-b border-rose-500/20 py-3 my-2">
-          "I didn't plan on loving you this much... but now I can't imagine my world without you in it."
-        </p>
-
-        <p>
-          I don't want to hide behind indirect poetic hints or joke around anymore. I want to stand beside you, support you, make you smile every single day, and give you all the love you truly deserve.
-        </p>
+      <div class="text-right mt-2 h-5">
+        <button id="tw-skip" type="button" onclick="Typewriter.skip()" class="text-[11px] text-slate-500 hover:text-rose-300 transition-colors cursor-pointer">Skip typing ⏭</button>
       </div>
 
-      <div class="mt-8 text-center p-6 rounded-2xl bg-gradient-to-r from-roseGlow/20 via-pink-500/15 to-lavenderGlow/20 border border-roseGlow/40 shadow-xl">
-        <p class="text-sm uppercase tracking-wider text-rose-200/80 font-medium">There's only one question left to ask...</p>
-        <p class="text-xl sm:text-3xl font-extrabold text-white mt-2 drop-shadow">
-          I love you. Can I be your boyfriend?
-        </p>
+      <!-- Appears (fades in) once the typing is finished -->
+      <div id="letter-cta" class="opacity-0 pointer-events-none transition-opacity duration-1000" inert>
+
+        <div class="mt-4 text-center p-6 rounded-2xl bg-gradient-to-r from-roseGlow/20 via-pink-500/15 to-lavenderGlow/20 border border-roseGlow/40 shadow-xl">
+          <p class="text-sm uppercase tracking-wider text-rose-200/80 font-medium">There's only one question left to ask...</p>
+          <p class="text-xl sm:text-3xl font-extrabold text-white mt-2 drop-shadow">
+            I love you. Can I be your boyfriend?
+          </p>
+        </div>
+
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+          <button onclick="chooseProposalYes()" class="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-semibold text-lg shadow-lg shadow-roseGlow/30 hover:shadow-roseGlow/60 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2">
+            <span>Yes, of course! ❤️</span>
+          </button>
+
+          <button onclick="chooseProposalNo()" class="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-800/90 hover:bg-slate-700 border border-slate-600/80 text-slate-300 font-medium text-base shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+            <span>No, I'm sorry 💔</span>
+          </button>
+        </div>
+
+        <p class="text-center text-xs text-slate-500 mt-4">Always yours, Sriparno</p>
+        <p class="text-center text-[11px] text-slate-500 mt-1">Your answer gets sent straight to Sriparno 💌</p>
       </div>
-
-      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-        <button onclick="chooseProposalYes()" class="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-semibold text-lg shadow-lg shadow-roseGlow/30 hover:shadow-roseGlow/60 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2">
-          <span>Yes, of course! ❤️</span>
-        </button>
-
-        <button onclick="chooseProposalNo()" class="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-800/90 hover:bg-slate-700 border border-slate-600/80 text-slate-300 font-medium text-base shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
-          <span>No, I'm sorry 💔</span>
-        </button>
-      </div>
-
-      <p class="text-center text-xs text-slate-500 mt-4">Always yours, Sriparno</p>
-      <p class="text-center text-[11px] text-slate-500 mt-1">Your answer gets sent straight to Sriparno 💌</p>
     </div>
 
     <!-- ==================== STEP 2: "YES" + DATE INVITATION ==================== -->
@@ -302,75 +382,105 @@
       </div>
     </div>
 
-    <!-- ==================== STEP 3A: DATE FORM ==================== -->
-    <div id="step-date-form" class="hidden glass-card rounded-3xl p-6 sm:p-10 space-y-6 fade-step">
+    <!-- ==================== STEP 3A: VIP DATE PASS BUILDER ==================== -->
+    <div id="step-date-form" class="hidden space-y-6 fade-step">
 
-      <div class="text-center space-y-2">
-        <span class="text-xs uppercase tracking-widest text-roseGlow font-semibold bg-roseGlow/10 px-3 py-1 rounded-full border border-roseGlow/20">
-          After-School Date Planner 🎒✨
-        </span>
-        <h2 class="text-2xl sm:text-4xl font-bold text-white">
-          Let's Plan Our First Hangout!
-        </h2>
-        <p class="text-slate-400 text-xs sm:text-sm">
-          Pick a school day (Mon, Wed, Thu, Fri) &amp; choose your favorite treat!
-        </p>
-      </div>
+      <div id="vip-controls" class="glass-card rounded-3xl p-6 sm:p-10 space-y-6">
 
-      <div class="space-y-6 bg-black/30 p-6 rounded-2xl border border-white/5">
-
-        <div class="space-y-2">
-          <label for="date-input" class="block text-sm font-semibold text-rose-200">
-            1. Select a Date (After School):
-          </label>
-          <input type="date" id="date-input" onchange="validateSelectedDate()" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:border-roseGlow focus:ring-1 focus:ring-roseGlow transition-colors cursor-pointer" style="color-scheme: dark;">
-          <p id="date-error" class="text-xs text-amber-400 hidden font-medium mt-1">
-            ⚠️ Tuesdays and weekends are excluded (school days only!). Please pick Monday, Wednesday, Thursday, or Friday.
+        <div class="text-center space-y-2">
+          <span class="text-xs uppercase tracking-widest text-roseGlow font-semibold bg-roseGlow/10 px-3 py-1 rounded-full border border-roseGlow/20">
+            VIP Date Pass Builder 🎟️✨
+          </span>
+          <h2 class="text-2xl sm:text-4xl font-bold text-white">
+            Design Our First Date!
+          </h2>
+          <p class="text-slate-400 text-xs sm:text-sm">
+            Customize your VIP pass below. Your ticket updates live as you choose. 💖
           </p>
         </div>
 
-        <div class="space-y-3">
-          <label class="block text-sm font-semibold text-rose-200">
-            2. Choose What We Should Eat Beside School:
-          </label>
+        <div class="space-y-6 bg-black/30 p-6 rounded-2xl border border-white/5">
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="space-y-3">
+            <label class="block text-sm font-semibold text-rose-200">1. Pick an activity:</label>
+            <div id="activity-options" class="grid grid-cols-2 gap-3"></div>
+          </div>
 
-            <div onclick="selectFood('doi')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectFood('doi');}" id="food-doi" role="button" tabindex="0"
-                 class="food-card selected p-4 rounded-xl bg-slate-900/90 border border-slate-700 cursor-pointer text-center space-y-2">
-              <div class="text-3xl">🥣</div>
-              <div class="font-bold text-sm text-white">Doi Fuchka</div>
-              <div class="text-[11px] text-slate-400">Sweet, tangy &amp; delicious</div>
+          <div class="space-y-3">
+            <label class="block text-sm font-semibold text-rose-200">2. Choose your treat:</label>
+            <div id="treat-options" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="date-input" class="block text-sm font-semibold text-rose-200">3. Select a date (school days only):</label>
+            <input type="date" id="date-input" onchange="VipPass.onDateChange()" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:border-roseGlow focus:ring-1 focus:ring-roseGlow transition-colors cursor-pointer" style="color-scheme: dark;">
+            <p id="date-error" class="text-xs text-amber-400 hidden font-medium mt-1">
+              ⚠️ Tuesdays and weekends are excluded (school days only!). Please pick Monday, Wednesday, Thursday, or Friday.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <label for="time-select" class="block text-sm font-semibold text-rose-200">4. What time?</label>
+            <select id="time-select" onchange="VipPass.render()" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:border-roseGlow cursor-pointer" style="color-scheme: dark;"></select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="food-note" class="block text-sm font-semibold text-rose-200">5. Anything else you want to tell me? (Optional)</label>
+            <input type="text" id="food-note" maxlength="60" oninput="VipPass.render()" placeholder="E.g., Extra phuchka water please!" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-roseGlow">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- The pass (kept outside the glass card so image export renders cleanly) -->
+      <div class="text-center space-y-4">
+        <p id="vip-badge" class="inline-block px-4 py-1.5 rounded-full bg-roseGlow/10 border border-roseGlow/30 text-roseGlow text-xs font-medium tracking-wider uppercase">
+          ✨ Live preview of your pass
+        </p>
+
+        <div id="vip-pass-capture">
+          <div id="vip-pass" class="vip-pass">
+            <div class="vip-top"><span>★ Sriparno Presents</span><span>Admit One</span></div>
+            <div class="vip-title">VIP DATE PASS</div>
+            <div class="vip-for">This pass is reserved for</div>
+            <div class="vip-name">Torsha 👑</div>
+
+            <div class="vip-rows">
+              <div class="vip-row"><span class="vip-label">Activity</span><span class="vip-value" id="vp-activity"></span></div>
+              <div class="vip-row"><span class="vip-label">Treat</span><span class="vip-value" id="vp-treat"></span></div>
+              <div class="vip-row"><span class="vip-label">Date</span><span class="vip-value" id="vp-date"></span></div>
+              <div class="vip-row"><span class="vip-label">Time</span><span class="vip-value" id="vp-time"></span></div>
+              <div class="vip-row"><span class="vip-label">Venue</span><span class="vip-value">Right beside school 🏫</span></div>
+              <div class="vip-row" id="vp-note-row" style="display:none;"><span class="vip-label">Note</span><span class="vip-value" id="vp-note"></span></div>
             </div>
 
-            <div onclick="selectFood('fuchka')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectFood('fuchka');}" id="food-fuchka" role="button" tabindex="0"
-                 class="food-card p-4 rounded-xl bg-slate-900/90 border border-slate-700 cursor-pointer text-center space-y-2">
-              <div class="text-3xl">🤤</div>
-              <div class="font-bold text-sm text-white">Classic Fuchka</div>
-              <div class="text-[11px] text-slate-400">Crispy, spicy street treat</div>
+            <div class="vip-tear"></div>
+
+            <div class="vip-foot">
+              <div>
+                <div class="vip-label">Ticket No.</div>
+                <div class="vip-ticket" id="vp-ticket"></div>
+                <div class="vip-issued" id="vp-issued"></div>
+              </div>
+              <div class="vip-barcode" id="vp-barcode"></div>
             </div>
 
-            <div onclick="selectFood('icecream')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectFood('icecream');}" id="food-icecream" role="button" tabindex="0"
-                 class="food-card p-4 rounded-xl bg-slate-900/90 border border-slate-700 cursor-pointer text-center space-y-2">
-              <div class="text-3xl">🍦</div>
-              <div class="font-bold text-sm text-white">Ice-Cream</div>
-              <div class="text-[11px] text-slate-400">Sweet &amp; chilling treat</div>
-            </div>
-
+            <div class="vip-stamp" id="vp-stamp">CONFIRMED</div>
           </div>
         </div>
 
-        <div class="space-y-2">
-          <label for="food-note" class="block text-sm font-semibold text-rose-200">
-            3. Anything else you want to tell me? (Optional)
-          </label>
-          <input type="text" id="food-note" maxlength="200" placeholder="E.g., Extra phuchka water please!" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-roseGlow">
-        </div>
-
-        <button id="lock-btn" onclick="submitDatePlan()" class="w-full py-4 rounded-xl bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-bold text-base shadow-lg shadow-roseGlow/30 hover:opacity-95 transition-opacity cursor-pointer">
-          Lock In Our Date Plan! 🔒✨
+        <button id="generate-btn" onclick="VipPass.generate()" class="w-full max-w-[440px] py-4 rounded-xl bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-bold text-base shadow-lg shadow-roseGlow/30 hover:opacity-95 transition-opacity cursor-pointer">
+          Generate My VIP Pass 🎟️✨
         </button>
 
+        <div id="vip-after" class="hidden space-y-3">
+          <button id="download-btn" onclick="VipPass.download()" class="w-full max-w-[440px] py-4 rounded-xl bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-bold text-base shadow-lg shadow-roseGlow/30 hover:opacity-95 transition-opacity cursor-pointer">
+            Save My VIP Pass 📥
+          </button>
+          <p class="text-xs text-slate-300">I can't wait for school to end that day so we can go get a treat together, Torsha! ✨</p>
+          <p id="send-status" class="text-[11px] text-slate-400"></p>
+          <p class="text-[11px] text-slate-500">On iPhone, if the image opens in a new tab, press and hold it and tap "Save to Photos".</p>
+        </div>
       </div>
     </div>
 
@@ -423,35 +533,6 @@
     </div>
 
   </main>
-
-  <!-- ==================== FINAL DATE SUMMARY MODAL ==================== -->
-  <div id="summary-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="summary-title">
-    <div id="summary-modal-card" class="glass-card max-w-md w-full rounded-3xl p-6 sm:p-8 text-center space-y-5 border border-roseGlow/40 shadow-2xl transform scale-95 transition-transform duration-300">
-
-      <div class="inline-flex p-3 rounded-full bg-roseGlow/20 text-roseGlow">
-        <svg class="w-8 h-8 fill-roseGlow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-      </div>
-
-      <h3 id="summary-title" class="text-2xl font-bold text-white">Our After-School Date is Set! 🎉</h3>
-
-      <div class="bg-black/40 p-4 rounded-xl text-left text-sm space-y-2 border border-white/5">
-        <p><strong class="text-rose-300">Date:</strong> <span id="summary-date-text" class="text-white"></span></p>
-        <p><strong class="text-rose-300">Selected Treat:</strong> <span id="summary-food-text" class="text-white"></span></p>
-        <p id="summary-note-box" class="hidden"><strong class="text-rose-300">Note:</strong> <span id="summary-note-text" class="text-slate-200 italic"></span></p>
-      </div>
-
-      <p class="text-xs text-slate-300 leading-relaxed">
-        I can't wait for school to end that day so we can go get a treat together, Torsha! ✨
-      </p>
-
-      <p id="send-status" class="text-[11px] text-slate-400"></p>
-
-      <button onclick="closeSummaryModal()" class="w-full py-3 rounded-xl bg-gradient-to-r from-roseGlow to-lavenderGlow text-white font-bold text-sm shadow-md hover:opacity-90 transition-opacity cursor-pointer">
-        Can't Wait! 💖
-      </button>
-
-    </div>
-  </div>
 
   <script>
     /* =====================================================
@@ -507,8 +588,11 @@
       no:      'sounds/no.mp3',
       success: 'sounds/success.mp3'
     };
-    const MUSIC_VOLUME = 0.35;   // 0 to 1
-    const SFX_VOLUME   = 0.8;    // 0 to 1
+    const MUSIC_VOLUME = 0.40;   // 0 to 1
+    const SFX_VOLUME   = 1.0;    // 0 to 1
+    const TYPE_VOLUME   = 0.50;  // typing sound volume, 0 to 1 (synthesized live, no file needed)
+    const TYPE_PITCH    = 1.5;   // typing sound pitch: 0.8 = deeper, 1.2 = higher
+    const TYPE_SOFTNESS = 3000;  // low-pass in Hz: lower = softer & duller (try 1400), higher = brighter (try 3000)
 
     const Sound = {
       muted: false,
@@ -544,6 +628,101 @@
         const a = base.cloneNode(); // lets quick repeats overlap
         a.volume = volume;
         a.play().catch(() => {});
+      },
+
+      /** Soft keyboard typing sound, synthesized live with the Web Audio API (no file needed).
+          Designed to be gentle: NO sharp click and NO high-frequency hiss.
+            1. warm body   : a short low "thup" that drops slightly in pitch
+            2. soft overtone: quiet triangle layer so phone speakers can hear it
+            3. cushion     : soft brown-noise puff (like a padded key landing)
+          Everything runs through a low-pass filter and has a 3 ms fade-in, so there are no hard edges.
+          Every key varies a little; the space bar is deeper and rounder. */
+      audioCtx: null,
+      noiseBuffer: null,
+      tick(ch) {
+        if (this.muted) return;
+        try {
+          if (!this.audioCtx) {
+            this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          const ctx = this.audioCtx;
+          if (ctx.state === 'suspended') ctx.resume();
+
+          if (!this.noiseBuffer) { // soft BROWN noise (not harsh white noise), generated once
+            const size = Math.floor(ctx.sampleRate * 0.2);
+            const buf = ctx.createBuffer(1, size, ctx.sampleRate);
+            const d = buf.getChannelData(0);
+            let last = 0;
+            for (let i = 0; i < size; i++) {
+              last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02;
+              d[i] = last * 3.5;
+            }
+            this.noiseBuffer = buf;
+          }
+
+          const isSpace = ch === ' ';
+          const t = ctx.currentTime;
+          const pitch = TYPE_PITCH * (0.95 + Math.random() * 0.1);
+          const vol = TYPE_VOLUME * (isSpace ? 1.1 : 1) * (0.85 + Math.random() * 0.3);
+
+          // output chain: low-pass (softens everything) -> tiny random pan -> speakers
+          const out = ctx.createBiquadFilter();
+          out.type = 'lowpass';
+          out.frequency.value = TYPE_SOFTNESS;
+          out.Q.value = 0.5;
+          if (ctx.createStereoPanner) {
+            const pan = ctx.createStereoPanner();
+            pan.pan.value = (Math.random() - 0.5) * 0.2;
+            out.connect(pan);
+            pan.connect(ctx.destination);
+          } else {
+            out.connect(ctx.destination);
+          }
+
+          // gentle envelope: 3 ms fade-in, smooth exponential fade-out
+          const env = (g, when, peak, decay) => {
+            g.gain.setValueAtTime(0.0001, when);
+            g.gain.linearRampToValueAtTime(peak, when + 0.003);
+            g.gain.exponentialRampToValueAtTime(0.0001, when + decay);
+          };
+
+          const tone = (wave, f0, f1, peak, decay) => {
+            const osc = ctx.createOscillator();
+            osc.type = wave;
+            osc.frequency.setValueAtTime(f0, t);
+            osc.frequency.exponentialRampToValueAtTime(f1, t + decay);
+            const g = ctx.createGain();
+            env(g, t, peak, decay);
+            osc.connect(g); g.connect(out);
+            osc.start(t);
+            osc.stop(t + decay + 0.01);
+          };
+
+          // 1. warm body
+          const f0 = (isSpace ? 200 : 270 + Math.random() * 40) * pitch;
+          const f1 = (isSpace ? 110 : 150) * pitch;
+          const bodyDecay = isSpace ? 0.085 : 0.06;
+          tone('sine', f0, f1, vol, bodyDecay);
+
+          // 2. soft overtone
+          tone('triangle', f0 * 1.5, f1 * 1.5, vol * 0.3, bodyDecay * 0.7);
+
+          // 3. cushion puff
+          const src = ctx.createBufferSource();
+          src.buffer = this.noiseBuffer;
+          const nf = ctx.createBiquadFilter();
+          nf.type = 'lowpass';
+          nf.frequency.value = 1100 * pitch;
+          nf.Q.value = 0.7;
+          const ng = ctx.createGain();
+          const nDecay = isSpace ? 0.05 : 0.03;
+          env(ng, t, vol * 0.5, nDecay);
+          src.connect(nf); nf.connect(ng); ng.connect(out);
+          src.start(t, Math.random() * 0.1);
+          src.stop(t + nDecay + 0.01);
+        } catch (e) {
+          // blocked by browser policy: stay silent
+        }
       },
 
       startMusic() {
@@ -655,12 +834,6 @@
     dateInput.value = getNextValidSchoolDay();
 
     /* -------- 3. State -------- */
-    const FOODS = {
-      doi:      { label: 'Doi Fuchka 🥣',    el: 'food-doi' },
-      fuchka:   { label: 'Classic Fuchka 🤤', el: 'food-fuchka' },
-      icecream: { label: 'Ice-Cream 🍦',      el: 'food-icecream' }
-    };
-    let selectedFood = 'doi';
     let envelopeOpened = false;
     let planSubmitted = false;
 
@@ -684,7 +857,7 @@
       Sound.play('open');
       Sound.startMusic(); // browsers only allow audio after a tap, so music begins here
       document.getElementById('main-envelope').classList.add('open');
-      setTimeout(() => showStep('step-letter'), 900);
+      setTimeout(() => { showStep('step-letter'); Typewriter.start(); }, 900);
     }
 
     /* -------- 5. Proposal answers (each one emails you) -------- */
@@ -713,95 +886,360 @@
       sendToSriparno('Date: not now 🌸', 'She said yes to the proposal but chose "Maybe another time / No for now" for the date.');
     }
 
-    /* -------- 7. Food selection -------- */
-    function selectFood(key) {
-      if (!FOODS[key]) return;
-      Sound.play('pop');
-      selectedFood = key;
-      Object.values(FOODS).forEach(f => document.getElementById(f.el).classList.remove('selected'));
-      document.getElementById(FOODS[key].el).classList.add('selected');
-    }
+    /* =====================================================
+       MODULE: TYPEWRITER LETTER
+       Edit the letter here. Rules:
+         - every new line (\n) becomes its own paragraph
+         - wrap a word/phrase in [[double brackets]] for the pink highlight
+         - start a line with "> " for the centered quote style
+       ===================================================== */
+    const LETTER_TEXT = `I’ll be completely honest with you... I don’t know the exact day, the exact hour, or the exact moment it happened. I don’t even know how or why my heart chose you. All I know with absolute certainty is that I fell deeply, completely, and undeniably in love with you.
+You’ve completely taken over my thoughts. Whether you’re jokingly demanding royal respect like a true [["Devi"]], or calling me [["Sipu"]], or when we end up making up hilarious names like [["snosa"]]—every single second spent talking to you feels like the best part of my entire day.
+I love the way we roast each other, I love late-night reels, and most of all, I love how effortless it feels just being myself around you. You have this beautiful, magnetic energy that makes everything else fade into the background.
+> "I didn't plan on loving you this much... but now I can't imagine my world without you in it."
+I don't want to hide behind indirect poetic hints or joke around anymore. I want to stand beside you, support you, make you smile every single day, and give you all the love you truly deserve.`;
 
-    /* -------- 8. Date validation -------- */
-    function validateSelectedDate() {
-      const errorMsg = document.getElementById('date-error');
-      if (!dateInput.value) { errorMsg.classList.remove('hidden'); return false; }
+    const Typewriter = {
+      CHAR_DELAY: 55,        // ms per character (lower = faster, higher = slower)
+      PARA_PAUSE: 750,       // ms pause between paragraphs
+      HL_CLASS: 'text-rose-300 font-semibold px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/30',
+      QUOTE_CLASS: 'pt-2 italic text-rose-200 font-serif text-center sm:text-lg border-t border-b border-rose-500/20 py-3 my-2',
 
-      const chosen = new Date(dateInput.value + 'T00:00:00');
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      const valid = isSchoolDay(chosen) && chosen >= today;
+      started: false, skipped: false, paras: [], cursor: null, _timer: null, _wake: null,
 
-      errorMsg.textContent = chosen < today
-        ? '⚠️ That date has already passed. Please pick an upcoming school day.'
-        : '⚠️ Tuesdays and weekends are excluded (school days only!). Please pick Monday, Wednesday, Thursday, or Friday.';
-      errorMsg.classList.toggle('hidden', valid);
-      return valid;
-    }
+      /** Parse LETTER_TEXT into paragraph elements (empty at first). */
+      build() {
+        const box = document.getElementById('letter-body');
+        box.innerHTML = '';
+        box.style.minHeight = '';
 
-    /* -------- 9. Submit the date plan -------- */
-    async function submitDatePlan() {
-      if (planSubmitted) return;
-      if (!validateSelectedDate()) {
-        alert('Please pick a valid upcoming school day (Mon, Wed, Thu, or Fri) for our after-school date!');
-        return;
+        this.paras = LETTER_TEXT.split('\n').map(l => l.trim()).filter(Boolean).map(line => {
+          const isQuote = line.startsWith('> ');
+          const text = isQuote ? line.slice(2) : line;
+          const p = document.createElement('p');
+          if (isQuote) p.className = this.QUOTE_CLASS;
+
+          const segs = [];
+          let last = 0;
+          text.replace(/\[\[(.+?)\]\]/g, (m, inner, idx) => {
+            if (idx > last) segs.push({ text: text.slice(last, idx) });
+            segs.push({ text: inner, hl: true });
+            last = idx + m.length;
+            return m;
+          });
+          if (last < text.length) segs.push({ text: text.slice(last) });
+
+          segs.forEach(seg => {
+            seg.node = document.createTextNode(seg.text);
+            if (seg.hl) {
+              const span = document.createElement('span');
+              span.className = this.HL_CLASS;
+              span.appendChild(seg.node);
+              p.appendChild(span);
+              seg.wrapper = span;
+            } else {
+              p.appendChild(seg.node);
+            }
+          });
+          box.appendChild(p);
+          return { el: p, segs };
+        });
+
+        // Lock the final height so the page doesn't jump while typing
+        box.style.minHeight = box.offsetHeight + 'px';
+
+        this.paras.forEach(pr => {
+          pr.el.style.visibility = 'hidden';
+          pr.segs.forEach(s => { s.node.data = ''; if (s.wrapper) s.wrapper.style.display = 'none'; });
+        });
+
+        this.cursor = document.createElement('span');
+        this.cursor.className = 'tw-cursor';
+        this.cursor.textContent = '|';
+        this.cursor.setAttribute('aria-hidden', 'true');
+      },
+
+      sleep(ms) {
+        if (this.skipped) return Promise.resolve();
+        return new Promise(resolve => { this._wake = resolve; this._timer = setTimeout(resolve, ms); });
+      },
+
+      /** Natural rhythm: longer pauses on punctuation. */
+      delayFor(ch, next) {
+        if (/[.!?]/.test(ch) && !/[.!?"”]/.test(next || '')) return this.CHAR_DELAY + 380;
+        if (ch === ',') return this.CHAR_DELAY + 170;
+        if (ch === '—') return this.CHAR_DELAY + 220;
+        return this.CHAR_DELAY + Math.random() * 25;
+      },
+
+      async start() {
+        if (this.started) return;
+        this.started = true;
+        this.build();
+
+        if (reduceMotion) { this.skipped = true; }
+
+        for (const para of this.paras) {
+          para.el.style.visibility = 'visible';
+          para.el.appendChild(this.cursor);
+          for (const seg of para.segs) {
+            if (seg.wrapper) seg.wrapper.style.display = '';
+            for (let i = 0; i < seg.text.length; i++) {
+              if (this.skipped) { seg.node.data = seg.text; break; }
+              seg.node.data = seg.text.slice(0, i + 1);
+              if (!this.skipped) Sound.tick(seg.text[i]);
+              await this.sleep(this.delayFor(seg.text[i], seg.text[i + 1]));
+            }
+          }
+          await this.sleep(this.PARA_PAUSE);
+        }
+        this.finish();
+      },
+
+      /** Jump straight to the full letter. */
+      skip() {
+        this.skipped = true;
+        clearTimeout(this._timer);
+        if (this._wake) this._wake();
+      },
+
+      finish() {
+        // fade the cursor out smoothly, then remove it
+        this.cursor.classList.add('fade');
+        setTimeout(() => this.cursor && this.cursor.remove(), 1000);
+
+        document.getElementById('tw-skip').classList.add('hidden');
+
+        const cta = document.getElementById('letter-cta');
+        cta.removeAttribute('inert');
+        cta.classList.remove('opacity-0', 'pointer-events-none');
+        setTimeout(() => cta.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 150);
       }
+    };
 
-      planSubmitted = true;
-      const btn = document.getElementById('lock-btn');
-      btn.disabled = true;
-      btn.classList.add('opacity-60', 'cursor-not-allowed');
+    /* =====================================================
+       MODULE: VIP DATE PASS
+       Edit the activities / treats / time slots here.
+       ===================================================== */
+    const ACTIVITIES = {
+      walk:  { icon: '🚶‍♀️', name: 'Walk & Talk',    desc: 'A slow stroll, endless chatter' },
+      chat:  { icon: '💬',   name: 'Chill & Chat',  desc: 'Just us, a bench & stories' },
+      photo: { icon: '📸',   name: 'Photo Moments', desc: 'Our first pictures together' },
+      music: { icon: '🎧',   name: 'Share Music',   desc: 'One earphone each, our playlist' }
+    };
 
-      const chosen = new Date(dateInput.value + 'T00:00:00');
-      const prettyDate = chosen.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-      const food = FOODS[selectedFood].label;
-      const note = document.getElementById('food-note').value.trim();
+    const TREATS = {
+      doi:      { icon: '🥣', name: 'Doi Fuchka',    desc: 'Sweet, tangy & delicious' },
+      fuchka:   { icon: '🤤', name: 'Classic Fuchka', desc: 'Crispy, spicy street treat' },
+      icecream: { icon: '🍦', name: 'Ice-Cream',     desc: 'Sweet & chilling treat' }
+    };
 
-      document.getElementById('summary-date-text').textContent = prettyDate;
-      document.getElementById('summary-food-text').textContent = food;
+    const TIME_SLOTS = ['Right after school', '4:00 PM', '4:30 PM', '5:00 PM'];
 
-      if (note) {
-        document.getElementById('summary-note-text').textContent = '"' + note + '"';
-        document.getElementById('summary-note-box').classList.remove('hidden');
-      } else {
-        document.getElementById('summary-note-box').classList.add('hidden');
+    const VipPass = {
+      plan: { activity: 'walk', treat: 'doi' },
+      ticketNo: null,
+      issuedAt: null,
+
+      init() {
+        this.renderOptions('activity-options', ACTIVITIES, 'activity');
+        this.renderOptions('treat-options', TREATS, 'treat');
+        document.getElementById('time-select').innerHTML =
+          TIME_SLOTS.map(t => '<option value="' + t + '">' + t + '</option>').join('');
+        this.render();
+      },
+
+      renderOptions(containerId, items, key) {
+        const box = document.getElementById(containerId);
+        box.innerHTML = '';
+        Object.entries(items).forEach(([id, item]) => {
+          const card = document.createElement('div');
+          card.className = 'food-card p-3 rounded-xl bg-slate-900/90 border border-slate-700 cursor-pointer text-center space-y-1'
+            + (this.plan[key] === id ? ' selected' : '');
+          card.setAttribute('role', 'button');
+          card.tabIndex = 0;
+          card.innerHTML =
+            '<div class="text-2xl">' + item.icon + '</div>' +
+            '<div class="font-bold text-sm text-white">' + item.name + '</div>' +
+            '<div class="text-[11px] text-slate-400">' + item.desc + '</div>';
+          const pick = () => {
+            if (planSubmitted) return;
+            this.plan[key] = id;
+            box.querySelectorAll('.food-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            Sound.play('pop');
+            this.render();
+          };
+          card.addEventListener('click', pick);
+          card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+          });
+          box.appendChild(card);
+        });
+      },
+
+      /* ----- date validation (no Tuesdays / weekends / past dates) ----- */
+      isDateValid() {
+        const v = document.getElementById('date-input').value;
+        if (!v) return false;
+        const chosen = new Date(v + 'T00:00:00');
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        return isSchoolDay(chosen) && chosen >= today;
+      },
+
+      onDateChange() {
+        const err = document.getElementById('date-error');
+        const v = document.getElementById('date-input').value;
+        if (!v) {
+          err.textContent = '⚠️ Please pick a date.';
+          err.classList.remove('hidden');
+        } else {
+          const chosen = new Date(v + 'T00:00:00');
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          err.textContent = chosen < today
+            ? '⚠️ That date has already passed. Please pick an upcoming school day.'
+            : '⚠️ Tuesdays and weekends are excluded (school days only!). Please pick Monday, Wednesday, Thursday, or Friday.';
+          err.classList.toggle('hidden', this.isDateValid());
+        }
+        this.render();
+      },
+
+      prettyDate() {
+        const v = document.getElementById('date-input').value;
+        if (!this.isDateValid()) return '— pick a school day —';
+        return new Date(v + 'T00:00:00').toLocaleDateString('en-IN',
+          { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+      },
+
+      /* ----- draw the pass from current choices ----- */
+      render() {
+        const act = ACTIVITIES[this.plan.activity];
+        const treat = TREATS[this.plan.treat];
+        const note = document.getElementById('food-note').value.trim();
+
+        document.getElementById('vp-activity').textContent = act.icon + ' ' + act.name;
+        document.getElementById('vp-treat').textContent = treat.icon + ' ' + treat.name;
+        document.getElementById('vp-date').textContent = this.prettyDate();
+        document.getElementById('vp-time').textContent = document.getElementById('time-select').value;
+
+        document.getElementById('vp-note').textContent = '“' + note + '”';
+        document.getElementById('vp-note-row').style.display = note ? 'flex' : 'none';
+
+        document.getElementById('vp-ticket').textContent = this.ticketNo || 'SP-••••••-••••';
+        document.getElementById('vp-issued').textContent = this.issuedAt
+          ? 'Issued ' + this.issuedAt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+          : 'Not issued yet';
+        document.getElementById('vp-barcode').innerHTML = this.barcode(this.ticketNo || 'PREVIEW');
+      },
+
+      /** Decorative barcode, derived from the ticket number. */
+      barcode(seed) {
+        let h = 7;
+        for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+        let out = '';
+        for (let i = 0; i < 40; i++) {
+          h = (h * 1664525 + 1013904223) >>> 0;
+          out += '<i style="width:' + (1 + (h >>> 28) % 3) + 'px"></i>';
+        }
+        return out;
+      },
+
+      makeTicketNo() {
+        const d = new Date();
+        const stamp = String(d.getFullYear()).slice(2) + pad(d.getMonth() + 1) + pad(d.getDate());
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let rand = '';
+        for (let i = 0; i < 4; i++) rand += chars[Math.floor(Math.random() * chars.length)];
+        return 'SP-' + stamp + '-' + rand;
+      },
+
+      /* ----- final step: issue the pass ----- */
+      async generate() {
+        if (planSubmitted) return;
+        if (!this.isDateValid()) {
+          this.onDateChange();
+          alert('Please pick a valid upcoming school day (Mon, Wed, Thu, or Fri) for our date!');
+          return;
+        }
+        planSubmitted = true;
+
+        this.ticketNo = this.makeTicketNo();
+        this.issuedAt = new Date();
+        this.render();
+
+        // lock the UI into "final pass" mode
+        document.getElementById('vp-stamp').classList.add('show');
+        document.getElementById('vip-controls').classList.add('hidden');
+        document.getElementById('generate-btn').classList.add('hidden');
+        document.getElementById('vip-after').classList.remove('hidden');
+        document.getElementById('vip-badge').textContent = '🎉 Your VIP pass is ready!';
+
+        Sound.play('success');
+        if (typeof confetti === 'function' && !reduceMotion) {
+          confetti({ particleCount: 130, spread: 80, origin: { y: 0.5 }, colors: ['#ff758c', '#ff7eb3', '#f5c26b', '#ffffff'] });
+        }
+        document.getElementById('vip-badge').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        const status = document.getElementById('send-status');
+        status.textContent = 'Sending your pass to Sriparno… 💌';
+
+        const note = document.getElementById('food-note').value.trim();
+        const ok = await sendToSriparno(
+          'VIP Date Pass generated 🎟️',
+          'Ticket: ' + this.ticketNo +
+          '\nActivity: ' + ACTIVITIES[this.plan.activity].name +
+          '\nTreat: ' + TREATS[this.plan.treat].name +
+          '\nDate: ' + this.prettyDate() +
+          '\nTime: ' + document.getElementById('time-select').value +
+          '\nNote: ' + (note || '(none)')
+        );
+
+        status.textContent = ok
+          ? 'Sent to Sriparno ✅'
+          : "Couldn't send automatically 🙈 Please save your pass and send it to Sriparno!";
+      },
+
+      /* ----- save the pass as a PNG ----- */
+      async download() {
+        const btn = document.getElementById('download-btn');
+        if (typeof html2canvas !== 'function') {
+          alert("Couldn't load the image saver. Please take a screenshot of your pass instead! 📸");
+          return;
+        }
+        Sound.play('click');
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Preparing your pass… ✨';
+        try {
+          if (document.fonts && document.fonts.ready) await document.fonts.ready;
+          const canvas = await html2canvas(document.getElementById('vip-pass-capture'), {
+            scale: 2,
+            backgroundColor: '#0b0813',
+            useCORS: true,
+            logging: false,
+            windowWidth: document.documentElement.clientWidth
+          });
+          const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+          if (!blob) throw new Error('Could not create image');
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'VIP-Date-Pass-' + (this.ticketNo || 'Torsha') + '.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+        } catch (err) {
+          console.error('Pass export failed:', err);
+          alert("Couldn't save the image automatically. Please take a screenshot of your pass instead! 📸");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = original;
+        }
       }
+    };
 
-      const status = document.getElementById('send-status');
-      status.textContent = 'Sending your plan to Sriparno… 💌';
-      Sound.play('success');
-      openSummaryModal();
-
-      if (typeof confetti === 'function' && !reduceMotion) {
-        confetti({ particleCount: 90, spread: 80, origin: { y: 0.5 }, colors: ['#ff758c', '#ff7eb3', '#fef3c7'] });
-      }
-
-      const ok = await sendToSriparno(
-        'Date plan locked in 🎉',
-        'Date: ' + prettyDate + '\nTreat: ' + food + '\nNote: ' + (note || '(none)')
-      );
-
-      status.textContent = ok
-        ? 'Sent to Sriparno ✅'
-        : "Couldn't send automatically 🙈 Please screenshot this and send it to Sriparno!";
-    }
-
-    /* -------- 10. Modal -------- */
-    function openSummaryModal() {
-      const modal = document.getElementById('summary-modal');
-      const card = document.getElementById('summary-modal-card');
-      modal.classList.remove('opacity-0', 'pointer-events-none');
-      card.classList.remove('scale-95');
-      card.classList.add('scale-100');
-    }
-
-    function closeSummaryModal() {
-      const modal = document.getElementById('summary-modal');
-      const card = document.getElementById('summary-modal-card');
-      card.classList.remove('scale-100');
-      card.classList.add('scale-95');
-      modal.classList.add('opacity-0', 'pointer-events-none');
-    }
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSummaryModal(); });
+    VipPass.init();
   </script>
 
 </body>
